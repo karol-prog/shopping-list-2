@@ -1,10 +1,8 @@
 <template>
-  <div class="container">
-    <aShoppingListsHeader />
+  <aShoppingListsHeader />
 
-    <div class="container-content">
-      <aShoppingListsContent />
-    </div>
+  <div class="container-content">
+    <aShoppingListsContent />
   </div>
 </template>
 
@@ -27,6 +25,7 @@ section {
 }
 
 input {
+  width: 40%;
   padding: 0.5rem;
   border: none;
   border-radius: 0.5rem;
@@ -59,23 +58,10 @@ button {
 .container-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   min-height: 100vh;
+  margin: 0 auto;
 }
-
-/* .shopping-list-data-sidebar {
-  max-width: 500px;
-  padding: 2rem;
-  border-right: 0.5px solid #1e293b;
-}
-
-.shopping-list-data-titles {
-  margin: 1rem;
-}
-
-.shopping-list-data-titles > button {
-  margin-left: 1rem;
-} */
 
 .shopping-list-data-content {
   display: flex;

@@ -1,10 +1,18 @@
 <template>
-  <div class="shopping-list-data-sidebar">
+  <div class="shopping-list-data">
     <ul>
       <h2>Your Shopping List</h2>
 
+      <form @submit.prevent="addNewList">
+        <input
+          type="text"
+          placeholder="Enter new list"
+          v-model="newListTitle"
+        />
+      </form>
+
       <li
-        class="shopping-list-data-titles"
+        class="shopping-list-data-lists"
         v-for="list in shoppingLists"
         :key="list.id"
       >
@@ -23,11 +31,17 @@
           <p>Error while loading data: {{ shoppingLists.error }}</p>
         </div>
 
-        <div v-else>
+        <div class="list-item" v-else>
           <ul>
-            <li v-for="item in list.items" :key="item.id">
+            <!-- render each item but in list screen only 3 items -->
+            <li
+              class="shopping-list-data-items"
+              v-for="item in list.items.slice(0, 3)"
+              :key="item.id"
+            >
               <p>{{ item.name }}</p>
               <p>{{ item.value }}</p>
+              <p>{{ item.unit }}</p>
             </li>
           </ul>
         </div>
@@ -43,6 +57,8 @@ export default {
     return {
       //variable for loading the data and set it to default state
       shoppingLists: null,
+      //for input
+      newListTitle: "",
     };
   },
 
@@ -55,7 +71,7 @@ export default {
       //set the data to shoppingList variable
       this.shoppingLists = shoppingLists;
       //console the structure of data in console
-      console.log(shoppingLists);
+      /* console.log(shoppingLists); */
     } catch (err) {
       //console the error
       console.error("Error", err);
@@ -70,6 +86,7 @@ export default {
       /* console.log(id); */
       try {
         await axios.delete(`/api/v1/shopping-lists/${id}`);
+
         this.shoppingLists = this.shoppingLists.filter((list) => {
           list.id !== id;
         });
@@ -77,6 +94,22 @@ export default {
         console.error("Error:", err);
       }
     },
+
+    //add new List
+    async addNewList() {
+      try {
+        /* console.log(this.newListTitle); */
+        await axios.post(`/api/v1/shopping-lists`, {
+          title: this.newListTitle,
+          items: [],
+        });
+
+        this.newListTitle = "";
+      } catch (err) {
+        console.log("Error:", err);
+      }
+    },
+
     //redirect to details by id
     openShoppingListDetail({ id }) {
       this.$router.push({ name: "Shopping List - Detail", params: { id } });
@@ -84,19 +117,33 @@ export default {
   },
 };
 </script>
+
 <style scoped>
-.shopping-list-data-sidebar {
-  /*  max-width: 500px;
-  padding: 2rem;
-  border-right: 0.5px solid #1e293b; */
+.shopping-list-data {
+  width: 60%;
   padding: 2rem;
 }
 
-.shopping-list-data-titles {
+.shopping-list-data-lists {
   margin: 1rem;
+  box-shadow: 0px 0px 20px 0px rgba(1, 0, 0, 0.5);
+  border-radius: 1rem;
+  padding: 0.5rem;
 }
 
-.shopping-list-data-titles > button {
+.shopping-list-data-lists > a {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.shopping-list-data-lists > button {
   margin-left: 1rem;
+}
+
+.shopping-list-data-items {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 0.5rem;
 }
 </style>
