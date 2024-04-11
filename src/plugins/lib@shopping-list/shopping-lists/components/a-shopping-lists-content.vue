@@ -21,7 +21,7 @@
           @click.prevent="openShoppingListDetail(list)"
           >{{ list.title }}</a
         >
-        <button @click="removeItem(list.id)">Remove</button>
+        <button @click="removeList(list.id)">Remove</button>
 
         <div v-if="!shoppingLists">
           <p>Loading Data</p>
@@ -82,14 +82,12 @@ export default {
 
   methods: {
     //remove item from server
-    async removeItem(id) {
-      /* console.log(id); */
+    async removeList(id) {
       try {
-        await axios.delete(`/api/v1/shopping-lists/${id}`);
-
-        this.shoppingLists = this.shoppingLists.filter((list) => {
-          list.id !== id;
-        });
+        const response = await axios.delete(`/api/v1/shopping-lists/${id}`);
+        let deleteList = response.data.data;
+        //delete from array deleted object
+        this.shoppingLists.splice(deleteList, 1);
       } catch (err) {
         console.error("Error:", err);
       }
@@ -98,12 +96,16 @@ export default {
     //add new List
     async addNewList() {
       try {
-        /* console.log(this.newListTitle); */
-        await axios.post(`/api/v1/shopping-lists`, {
+        //fetch the promise and make an object in it POST
+        const response = await axios.post(`/api/v1/shopping-lists`, {
           title: this.newListTitle,
           items: [],
         });
 
+        const newList = response.data.data;
+        //push to the top new list
+        this.shoppingLists.unshift(newList);
+        //reset the input
         this.newListTitle = "";
       } catch (err) {
         console.log("Error:", err);

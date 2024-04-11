@@ -56,11 +56,9 @@ button {
 }
 
 .container-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
   min-height: 100vh;
-  margin: 0 auto;
+  display: flex;
+  justify-content: start;
 }
 
 .shopping-list-data-content {

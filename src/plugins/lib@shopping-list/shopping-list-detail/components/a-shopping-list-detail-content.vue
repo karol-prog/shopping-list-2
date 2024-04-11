@@ -2,7 +2,11 @@
   <div class="shopping-list-data-detail">
     <ul v-for="item in shoppingList?.items" :key="item.id">
       <li class="shopping-list-data-items">
-        <input type="checkbox" :id="item.id" @change="isChecked(item.id)" />
+        <input
+          type="checkbox"
+          v-model="item.is_checked"
+          @change="isChecked(item)"
+        />
         <p>{{ item.name }}</p>
         <p>{{ item.value }}</p>
         <p>{{ item.unit }}</p>
@@ -11,6 +15,7 @@
     <form @submit.prevent="addNewItem">
       <input type="text" placeholder="Enter your new item" v-model="newItem" />
     </form>
+    <button class="detail-btn" @click="removeItem(item)">Remove item</button>
   </div>
 </template>
 
@@ -22,6 +27,7 @@ export default {
     return {
       shoppingList: null,
       newItem: "",
+      isCheck: null,
     };
   },
 
@@ -33,7 +39,6 @@ export default {
       this.shoppingList = shoppingLists.find(
         ({ id }) => id == this.$route.params.id
       );
-      console.log("Shopping List:", this.shoppingList.items);
     } catch (error) {
       console.error("Error:", error);
       this.shoppingList = { error };
@@ -41,28 +46,42 @@ export default {
   },
 
   methods: {
+    //add new items to details
     async addNewItem() {
       try {
         const newItems = {
           name: this.newItem,
-          unit: "pieces",
+          unit: "piece",
           value: 1,
           is_checked: false,
         };
-        await axios.post(`/api/v1/shopping-lists/items`, newItems);
+        const response = await axios.post(
+          `/api/v1/shopping-lists/${this.$route.params.id}/items`,
+          newItems
+        );
+        const newItemsToDetail = response.data.data;
+        //push the new item to shopping list items
+        this.shoppingList.items.push(newItemsToDetail);
+        //rest the input
+        this.newItem = "";
       } catch (err) {
         console.error("Error:", err);
       }
     },
 
-    async isChecked(itemId) {
+    //change the checked to true and back to false if it is unchecked
+    async isChecked(item) {
+      this.isCheck = item.is_checked;
       try {
-        await axios.post(
-          `/api/v1/shopping-lists/${this.$route.params.id}/items/${itemId}`,
+        //update is_checked in items on backend
+        await axios.put(
+          `/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
           {
-            is_checked: true,
+            is_checked: this.isCheck,
           }
         );
+        console.log(item);
+        console.log(this.shoppingList.items);
       } catch (err) {
         console.error("Error:", err);
       }
@@ -98,5 +117,9 @@ export default {
   grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   padding: 0.5rem;
+}
+
+.detail-btn {
+  margin-top: 1rem;
 }
 </style>
