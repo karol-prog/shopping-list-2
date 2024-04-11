@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkshopping_list_2"]=self["webpackChunkshopping_list_2"]||[]).push([[290],{1290:function(n,u,t){t.r(u),t.d(u,{default:function(){return a}});var e=t(6768);function r(n,u){return(0,e.uX)(),(0,e.CE)("h1",null,"Page not found")}var s=t(1241);const i={},o=(0,s.A)(i,[["render",r]]);var a=o}}]);
+//# sourceMappingURL=290.77353933.js.map
