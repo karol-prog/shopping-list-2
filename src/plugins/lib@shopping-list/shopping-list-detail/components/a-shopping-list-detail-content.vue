@@ -88,15 +88,21 @@ export default {
     //remove items from details
     async removeItemDetail() {
       try {
+        //filtter the items with is_checked = true
         const checkedItems = this.shoppingList.items.filter((item) => {
           return item.is_checked === true;
         });
 
-        console.log(checkedItems);
-        checkedItems.forEach(async (item) => {
+        //iterate over each one and delete it from be
+        checkedItems.map(async (item) => {
           await axios.delete(
             `/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`
           );
+
+          //updates items in shoping list with is_checked = true
+          this.shoppingList.items = this.shoppingList.items.filter((item) => {
+            return !item.is_checked;
+          });
         });
       } catch (err) {
         console.error("Error:", err);

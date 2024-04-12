@@ -56,10 +56,11 @@ button {
 }
 
 .container-content {
-  min-height: 100vh;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: start;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .shopping-list-data-content {
