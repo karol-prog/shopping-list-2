@@ -15,7 +15,7 @@
     <form @submit.prevent="addNewItem">
       <input type="text" placeholder="Enter your new item" v-model="newItem" />
     </form>
-    <button class="detail-btn" @click="removeItem(item)">Remove item</button>
+    <button class="detail-btn" @click="removeItemDetail">Remove item</button>
   </div>
 </template>
 
@@ -80,8 +80,24 @@ export default {
             is_checked: this.isCheck,
           }
         );
-        console.log(item);
-        console.log(this.shoppingList.items);
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    },
+
+    //remove items from details
+    async removeItemDetail() {
+      try {
+        const checkedItems = this.shoppingList.items.filter((item) => {
+          return item.is_checked === true;
+        });
+
+        console.log(checkedItems);
+        checkedItems.forEach(async (item) => {
+          await axios.delete(
+            `/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`
+          );
+        });
       } catch (err) {
         console.error("Error:", err);
       }
@@ -115,6 +131,7 @@ export default {
 .shopping-list-data-items {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  align-items: center;
   gap: 2rem;
   padding: 0.5rem;
 }
