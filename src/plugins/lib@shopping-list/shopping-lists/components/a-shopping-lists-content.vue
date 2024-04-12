@@ -70,8 +70,6 @@ export default {
       } = await axios.get("/api/v1/shopping-lists");
       //set the data to shoppingList variable
       this.shoppingLists = shoppingLists;
-      //console the structure of data in console
-      /* console.log(shoppingLists); */
     } catch (err) {
       //console the error
       console.error("Error", err);
