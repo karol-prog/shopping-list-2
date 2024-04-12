@@ -35,7 +35,9 @@ export default {
     try {
       const {
         data: { data: shoppingLists },
-      } = await axios.get("/api/v1/shopping-lists");
+      } = await axios.get(
+        "https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists"
+      );
       this.shoppingList = shoppingLists.find(
         ({ id }) => id == this.$route.params.id
       );
@@ -56,7 +58,7 @@ export default {
           is_checked: false,
         };
         const response = await axios.post(
-          `/api/v1/shopping-lists/${this.$route.params.id}/items`,
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
           newItems
         );
         const newItemsToDetail = response.data.data;
@@ -75,7 +77,7 @@ export default {
       try {
         //update is_checked in items on backend
         await axios.put(
-          `/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
           {
             is_checked: this.isCheck,
           }
@@ -96,7 +98,7 @@ export default {
         //iterate over each one and delete it from be
         checkedItems.map(async (item) => {
           await axios.delete(
-            `/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`
+            `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`
           );
 
           //updates items in shoping list with is_checked = true

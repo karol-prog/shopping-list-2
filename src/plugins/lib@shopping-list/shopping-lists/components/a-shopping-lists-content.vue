@@ -84,7 +84,9 @@ export default {
     //remove item from server
     async removeList(id) {
       try {
-        const response = await axios.delete(`/api/v1/shopping-lists/${id}`);
+        const response = await axios.delete(
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${id}`
+        );
         let deleteList = response.data.data;
         //delete from array deleted object
         this.shoppingLists.splice(deleteList, 1);
@@ -97,10 +99,13 @@ export default {
     async addNewList() {
       try {
         //fetch the promise and make an object in it POST
-        const response = await axios.post(`/api/v1/shopping-lists`, {
-          title: this.newListTitle,
-          items: [],
-        });
+        const response = await axios.post(
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists`,
+          {
+            title: this.newListTitle,
+            items: [],
+          }
+        );
 
         const newList = response.data.data;
         //push to the top new list
