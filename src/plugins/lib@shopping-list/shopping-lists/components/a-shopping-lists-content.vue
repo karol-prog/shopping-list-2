@@ -3,18 +3,17 @@
     <ul>
       <h2>Your Shopping List</h2>
 
-      <form @submit.prevent="addNewList">
-        <input
-          type="text"
-          placeholder="Enter new list"
-          v-model="newListTitle"
-        />
-      </form>
+      <input
+        v-model="newListTitle"
+        @keydown.enter="addNewList"
+        type="text"
+        placeholder="Enter new list"
+      />
 
       <li
-        class="shopping-list-data-lists"
         v-for="list in shoppingLists"
         :key="list.id"
+        class="shopping-list-data-lists"
       >
         <a
           :href="`/shopping-lists/${list.id}`"
@@ -35,9 +34,9 @@
           <ul>
             <!-- render each item but in list screen only 3 items -->
             <li
-              class="shopping-list-data-items"
               v-for="item in list.items.slice(0, 3)"
               :key="item.id"
+              class="shopping-list-data-items"
             >
               <p>{{ item.name }}</p>
               <p>{{ item.value }}</p>
@@ -87,9 +86,13 @@ export default {
         const response = await axios.delete(
           `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${id}`
         );
+
         let deleteList = response.data.data;
-        //delete from array deleted object
-        this.shoppingLists.splice(deleteList, 1);
+
+        //filter out from shopping list the id that match delete list
+        this.shoppingLists = this.shoppingLists.filter((list) => {
+          return list.id !== deleteList.id;
+        });
       } catch (err) {
         console.error("Error:", err);
       }
@@ -98,20 +101,24 @@ export default {
     //add new List
     async addNewList() {
       try {
-        //fetch the promise and make an object in it POST
-        const response = await axios.post(
-          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists`,
-          {
-            title: this.newListTitle,
-            items: [],
-          }
-        );
+        //check if input have something in it = true
+        if (this.newListTitle.trim().length) {
+          //fetch the promise and make an object in it POST
+          const response = await axios.post(
+            `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists`,
+            {
+              title: this.newListTitle.trim(),
+              items: [],
+            }
+          );
+          const newList = response.data.data;
 
-        const newList = response.data.data;
-        //push to the top new list
-        this.shoppingLists.unshift(newList);
-        //reset the input
-        this.newListTitle = "";
+          //push to the top new list
+          this.shoppingLists.unshift(newList);
+
+          //reset the input
+          this.newListTitle = "";
+        }
       } catch (err) {
         console.log("Error:", err);
       }

@@ -3,18 +3,23 @@
     <ul v-for="item in shoppingList?.items" :key="item.id">
       <li class="shopping-list-data-items">
         <input
-          type="checkbox"
           v-model="item.is_checked"
           @change="isChecked(item)"
+          type="checkbox"
         />
         <p>{{ item.name }}</p>
         <p>{{ item.value }}</p>
         <p>{{ item.unit }}</p>
       </li>
     </ul>
-    <form @submit.prevent="addNewItem">
-      <input type="text" placeholder="Enter your new item" v-model="newItem" />
-    </form>
+
+    <input
+      v-model="newItem"
+      @keydown.enter="addNewItem"
+      type="text"
+      placeholder="Enter your new item"
+    />
+
     <button class="detail-btn" @click="removeItemDetail">Remove item</button>
   </div>
 </template>
@@ -27,7 +32,6 @@ export default {
     return {
       shoppingList: null,
       newItem: "",
-      isCheck: null,
     };
   },
 
@@ -52,20 +56,26 @@ export default {
     async addNewItem() {
       try {
         const newItems = {
-          name: this.newItem,
+          name: this.newItem.trim(),
           unit: "piece",
           value: 1,
           is_checked: false,
         };
-        const response = await axios.post(
-          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
-          newItems
-        );
-        const newItemsToDetail = response.data.data;
-        //push the new item to shopping list items
-        this.shoppingList.items.push(newItemsToDetail);
-        //rest the input
-        this.newItem = "";
+
+        //check if input have something in it = true
+        if (this.newItem.trim().length) {
+          const response = await axios.post(
+            `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
+            newItems
+          );
+          const newItemsToDetail = response.data.data;
+
+          //push the new item to shopping list items
+          this.shoppingList.items.push(newItemsToDetail);
+
+          //reset the input
+          this.newItem = "";
+        }
       } catch (err) {
         console.error("Error:", err);
       }
@@ -73,13 +83,12 @@ export default {
 
     //change the checked to true and back to false if it is unchecked
     async isChecked(item) {
-      this.isCheck = item.is_checked;
       try {
         //update is_checked in items on backend
         await axios.put(
           `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
           {
-            is_checked: this.isCheck,
+            is_checked: item.is_checked,
           }
         );
       } catch (err) {
@@ -96,7 +105,7 @@ export default {
         });
 
         //iterate over each one and delete it from be
-        checkedItems.map(async (item) => {
+        checkedItems.forEach(async (item) => {
           await axios.delete(
             `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`
           );
@@ -145,7 +154,7 @@ export default {
 }
 
 .detail-btn {
-  margin-top: 1rem;
+  margin-left: 1rem;
 }
 
 @media screen and (max-width: 425px) {

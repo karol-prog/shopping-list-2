@@ -2,7 +2,12 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
   {
-    path: "",
+    path: "/",
+    redirect: "/shopping-lists",
+  },
+
+  {
+    path: "/shopping-lists",
     name: "Shopping List - List",
     component: () =>
       import("@/plugins/lib@shopping-list/shopping-lists/shopping-lists.vue"),
