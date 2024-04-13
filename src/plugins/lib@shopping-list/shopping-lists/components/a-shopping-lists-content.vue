@@ -153,4 +153,10 @@ export default {
   gap: 2rem;
   padding: 0.5rem;
 }
+
+@media screen and (max-width: 425px) {
+  .shopping-list-data {
+    width: 100%;
+  }
+}
 </style>

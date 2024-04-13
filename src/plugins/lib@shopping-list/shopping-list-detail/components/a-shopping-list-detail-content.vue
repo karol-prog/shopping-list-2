@@ -147,4 +147,10 @@ export default {
 .detail-btn {
   margin-top: 1rem;
 }
+
+@media screen and (max-width: 425px) {
+  .shopping-list-data-detail {
+    width: 80%;
+  }
+}
 </style>
