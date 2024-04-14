@@ -102,7 +102,9 @@ export default {
     async addNewList() {
       try {
         //check if input have something in it = true
-        if (this.newListTitle.trim().length) {
+        if (!this.newListTitle.trim().length) {
+          return;
+        } else {
           //fetch the promise and make an object in it POST
           const response = await axios.post(
             `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists`,

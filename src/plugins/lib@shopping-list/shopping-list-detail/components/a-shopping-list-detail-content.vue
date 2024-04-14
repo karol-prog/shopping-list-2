@@ -63,7 +63,9 @@ export default {
         };
 
         //check if input have something in it = true
-        if (this.newItem.trim().length) {
+        if (!this.newItem.trim().length) {
+          return;
+        } else {
           const response = await axios.post(
             `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
             newItems
