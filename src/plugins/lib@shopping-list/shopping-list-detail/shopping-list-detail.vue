@@ -22,7 +22,8 @@ section {
   min-height: 100vh;
 }
 
-input {
+input,
+select {
   width: 40%;
   padding: 0.5rem;
   border: none;

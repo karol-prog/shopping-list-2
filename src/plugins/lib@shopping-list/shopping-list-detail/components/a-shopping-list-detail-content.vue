@@ -7,9 +7,34 @@
           @change="isChecked(item)"
           type="checkbox"
         />
-        <p>{{ item.name }}</p>
-        <p>{{ item.value }}</p>
-        <p>{{ item.unit }}</p>
+
+        <!-- no editing -->
+        <div
+          v-if="changeItems !== item.id"
+          @click="showItemToShow(item.id)"
+          class="items-prop"
+        >
+          <p>{{ item.name }}</p>
+          <p>{{ item.value }}</p>
+          <p>{{ item.unit }}</p>
+        </div>
+
+        <!-- for editing -->
+        <div
+          v-else
+          @keypress.enter="addUpdatedItem(item)"
+          @keydown.esc="hideEditItem"
+          class="items-prop"
+        >
+          <input v-model="newTitle" type="text" />
+          <input v-model="newValue" type="number" placeholder="1" />
+          <select v-model="newUnit">
+            <option value="grams">grams</option>
+            <option value="kilograms">kilograms</option>
+            <option value="piece">piece</option>
+            <option value="package">packages</option>
+          </select>
+        </div>
       </li>
     </ul>
 
@@ -32,6 +57,10 @@ export default {
     return {
       shoppingList: null,
       newItem: "",
+      changeItems: null,
+      newTitle: "",
+      newValue: "",
+      newUnit: "",
     };
   },
 
@@ -121,6 +150,46 @@ export default {
         console.error("Error:", err);
       }
     },
+
+    //update items
+    async addUpdatedItem(item) {
+      try {
+        if (!this.newTitle.trim().length || !this.newUnit.trim().length) {
+          return;
+        } else {
+          const response = await axios.put(
+            `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
+            {
+              name: this.newTitle,
+              value: this.newValue,
+              unit: this.newUnit,
+            }
+          );
+          const updatedItem = response.data.data;
+
+          //change the values to update one
+          item.name = updatedItem.name;
+          item.value = updatedItem.value;
+          item.unit = updatedItem.unit;
+
+          //back to default div
+          this.changeItems = null;
+        }
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    },
+
+    //for showing the editing div in current selected item
+    showItemToShow(id) {
+      //write the id to changeItems var
+      this.changeItems = id;
+    },
+
+    //hide editing item with esc
+    hideEditItem() {
+      this.changeItems = !this.changeItems;
+    },
   },
 };
 </script>
@@ -149,14 +218,20 @@ export default {
 
 .shopping-list-data-items {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 10% 1fr;
   align-items: center;
-  gap: 2rem;
   padding: 0.5rem;
 }
 
 .detail-btn {
   margin-left: 1rem;
+}
+
+.items-prop {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-content: center;
+  align-items: center;
 }
 
 @media screen and (max-width: 425px) {
