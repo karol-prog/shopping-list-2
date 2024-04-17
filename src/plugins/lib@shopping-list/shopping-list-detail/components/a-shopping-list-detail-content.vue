@@ -1,6 +1,17 @@
 <template>
-  <div class="shopping-list-data-detail">
-    <ul v-for="item in shoppingList?.items" :key="item.id">
+  <!-- Loading the data -->
+  <div v-if="!shoppingLists">
+    <div class="lds-dual-ring"></div>
+  </div>
+
+  <!-- error while loading -->
+  <div v-else-if="shoppingLists.error">
+    <p>Error while loading data: {{ shoppingLists.error }}</p>
+  </div>
+
+  <!-- successfull data load -->
+  <div v-else class="shopping-list-data-detail">
+    <ul v-for="item in shoppingLists?.items" :key="item.id">
       <li class="shopping-list-data-items">
         <input
           v-model="item.is_checked"
@@ -15,8 +26,11 @@
           class="items-prop"
         >
           <p>{{ item.name }}</p>
-          <p>{{ item.value }}</p>
-          <p>{{ item.unit }}</p>
+
+          <div class="value-units">
+            <p>{{ item.value }}</p>
+            <p>{{ item.unit }}</p>
+          </div>
         </div>
 
         <!-- for editing -->
@@ -26,8 +40,8 @@
           @keydown.esc="hideEditItem"
           class="items-prop"
         >
-          <input v-model="newTitle" type="text" />
-          <input v-model="newValue" type="number" placeholder="1" />
+          <input v-model="newTitle" type="text" placeholder="Enter new item" />
+          <input v-model="newValue" type="number" placeholder="1" min="0" />
           <select v-model="newUnit">
             <option value="grams">grams</option>
             <option value="kilograms">kilograms</option>
@@ -55,7 +69,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      shoppingList: null,
+      shoppingLists: null,
       newItem: "",
       changeItems: null,
       newTitle: "",
@@ -71,7 +85,7 @@ export default {
       } = await axios.get(
         "https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists"
       );
-      this.shoppingList = shoppingLists.find(
+      this.shoppingLists = shoppingLists.find(
         ({ id }) => id == this.$route.params.id
       );
     } catch (error) {
@@ -102,7 +116,7 @@ export default {
           const newItemsToDetail = response.data.data;
 
           //push the new item to shopping list items
-          this.shoppingList.items.push(newItemsToDetail);
+          this.shoppingLists.items.push(newItemsToDetail);
 
           //reset the input
           this.newItem = "";
@@ -131,7 +145,7 @@ export default {
     async removeItemDetail() {
       try {
         //filtter the items with is_checked = true
-        const checkedItems = this.shoppingList.items.filter((item) => {
+        const checkedItems = this.shoppingLists.items.filter((item) => {
           return item.is_checked === true;
         });
 
@@ -142,7 +156,7 @@ export default {
           );
 
           //updates items in shoping list with is_checked = true
-          this.shoppingList.items = this.shoppingList.items.filter((item) => {
+          this.shoppingLists.items = this.shoppingLists.items.filter((item) => {
             return !item.is_checked;
           });
         });
@@ -172,6 +186,11 @@ export default {
           item.value = updatedItem.value;
           item.unit = updatedItem.unit;
 
+          //reset the variables
+          this.newTitle = "";
+          this.newValue = "";
+          this.newUnit = "";
+
           //back to default div
           this.changeItems = null;
         }
@@ -200,7 +219,7 @@ export default {
 }
 
 .shopping-list-data-detail {
-  width: 60%;
+  width: 50%;
   margin: 1rem;
   box-shadow: 0px 0px 20px 0px rgba(1, 0, 0, 0.5);
   border-radius: 1rem;
@@ -228,10 +247,46 @@ export default {
 }
 
 .items-prop {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  justify-content: center;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+}
+
+.value-units {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* loading data */
+.lds-dual-ring,
+.lds-dual-ring:after {
+  box-sizing: border-box;
+}
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6.4px solid currentColor;
+  border-color: currentColor transparent currentColor transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media screen and (max-width: 425px) {

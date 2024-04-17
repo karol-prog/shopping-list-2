@@ -1,51 +1,55 @@
 <template>
   <div class="shopping-list-data">
-    <ul>
-      <h2>Your Shopping List</h2>
+    <h2>Your Shopping List</h2>
+    <input
+      v-model="newListTitle"
+      @keydown.enter="addNewList"
+      type="text"
+      placeholder="Enter new list"
+    />
 
-      <input
-        v-model="newListTitle"
-        @keydown.enter="addNewList"
-        type="text"
-        placeholder="Enter new list"
-      />
+    <!-- Loading the data -->
+    <div v-if="!shoppingLists">
+      <div class="lds-dual-ring"></div>
+    </div>
 
-      <li
-        v-for="list in shoppingLists"
-        :key="list.id"
-        class="shopping-list-data-lists"
+    <!-- error while loading -->
+    <div v-else-if="shoppingLists.error">
+      <p>Error while loading data: {{ shoppingLists.error }}</p>
+    </div>
+
+    <!-- successfull data load -->
+    <div
+      v-else
+      v-for="list in shoppingLists"
+      :key="list.id"
+      class="shopping-list-data-lists"
+    >
+      <a
+        :href="`/shopping-lists/${list.id}`"
+        @click.prevent="openShoppingListDetail(list)"
+        >{{ list.title }}</a
       >
-        <a
-          :href="`/shopping-lists/${list.id}`"
-          @click.prevent="openShoppingListDetail(list)"
-          >{{ list.title }}</a
-        >
-        <button @click="removeList(list.id)">Remove</button>
+      <button @click="removeList(list.id)">Remove</button>
 
-        <div v-if="!shoppingLists">
-          <p>Loading Data</p>
-        </div>
+      <div class="list-item">
+        <ul>
+          <!-- render each item but in list screen only 3 items -->
+          <li
+            v-for="item in list.items.slice(0, 3)"
+            :key="item.id"
+            class="shopping-list-data-items"
+          >
+            <p>{{ item.name }}</p>
 
-        <div v-else-if="shoppingLists.error">
-          <p>Error while loading data: {{ shoppingLists.error }}</p>
-        </div>
-
-        <div class="list-item" v-else>
-          <ul>
-            <!-- render each item but in list screen only 3 items -->
-            <li
-              v-for="item in list.items.slice(0, 3)"
-              :key="item.id"
-              class="shopping-list-data-items"
-            >
-              <p>{{ item.name }}</p>
+            <div class="value-units">
               <p>{{ item.value }}</p>
               <p>{{ item.unit }}</p>
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -136,7 +140,7 @@ export default {
 
 <style scoped>
 .shopping-list-data {
-  width: 60%;
+  width: 50%;
   padding: 2rem;
 }
 
@@ -156,11 +160,52 @@ export default {
   margin-left: 1rem;
 }
 
+.list-item {
+  padding: 1rem;
+}
+
 .shopping-list-data-items {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 2rem;
   padding: 0.5rem;
+}
+
+.value-units {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* loading data */
+.lds-dual-ring,
+.lds-dual-ring:after {
+  box-sizing: border-box;
+}
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6.4px solid currentColor;
+  border-color: currentColor transparent currentColor transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media screen and (max-width: 425px) {
